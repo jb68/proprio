@@ -23,8 +23,6 @@ SECRET_KEY = 'ov3sfsyj4*@0)m@3-j+m%%(0ms*et@d0hb+pl#6z2m(t=be*(n'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
 # hack from http://stackoverflow.com/a/7651002/436792
 TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 
@@ -33,7 +31,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'main',
     'bank_import',
     'django.contrib.admin',
@@ -44,9 +42,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'lineage',  # https://github.com/marcuswhybrow/django-lineage
     'bootstrapform',  # https://github.com/tzangms/django-bootstrap-form
-)
+]
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -54,18 +52,30 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages",
-    'django.core.context_processors.request',  # for django-lineage
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.core.context_processors.debug',
+                'django.core.context_processors.i18n',
+                'django.core.context_processors.media',
+                'django.core.context_processors.static',
+                'django.core.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.request',  # for django-lineage
+            ],
+        },
+    },
+]
+
 ROOT_URLCONF = 'proprio.urls'
 
 # Database
