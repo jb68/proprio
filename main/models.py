@@ -445,7 +445,7 @@ TWOPLACES = Decimal('0.00')
 
 
 def fractional_amount(amount, days, month_days):
-    """Computes the amount for monthes that are not paid in full
+    """Computes the amount for months that are not paid in full
     """
     return Decimal(amount * days / month_days).quantize(TWOPLACES)
 
