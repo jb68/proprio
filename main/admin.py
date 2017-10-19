@@ -9,19 +9,41 @@ from django.utils.safestring import mark_safe
 class BuildingFileInline(admin.TabularInline):
     model = models.BuildingFile
 
+class BuildingPhotoAdmin(admin.ModelAdmin):
+    fields = ["building","name","image",]
+    list_display = ("image","image_thm")
+
+    def building_link(self, obj):
+        if obj.building is None:
+            return _('No associated building')
+        url = urlresolvers.reverse(
+            'admin:main_building_change', args=(obj.building.id,))
+        return format_html(u'<a href={}>{}</a>', mark_safe(url), obj.building)
+    building_link.short_description = _('link to the building')
+    readonly_fields = ('building_link',)
+
+
+class BuildingPhotoInline(admin.TabularInline):
+    model = models.BuildingPhoto
+
 
 class BuildingAdmin(admin.ModelAdmin):
     list_display = ('name', 'property_count')
-    inlines = [BuildingFileInline]
+    inlines = [BuildingPhotoInline,BuildingFileInline]
 
 
 class PropertyFileInline(admin.TabularInline):
     model = models.PropertyFile
 
+class UtilityFileInline(admin.TabularInline):
+    model = models.Utility
+
+class RoomInline(admin.TabularInline):
+    model = models.Room
 
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'address', 'building')
-    inlines = [PropertyFileInline]
+    list_display = ('name', 'address', 'building', 'plan_thm')
+    inlines = [RoomInline,UtilityFileInline,PropertyFileInline]
 
     def building_link(self, obj):
         if obj.building is None:
@@ -102,6 +124,7 @@ class TenantRemindersAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.Building, BuildingAdmin)
+admin.site.register(models.BuildingPhoto, BuildingPhotoAdmin)
 admin.site.register(models.Property, PropertyAdmin)
 admin.site.register(models.Tenant, TenantAdmin)
 admin.site.register(TenantReminders, TenantRemindersAdmin)
