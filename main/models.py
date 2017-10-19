@@ -2,7 +2,8 @@
 from django.db import models
 from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
-from django.core.validators import MinValueValidator, ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator, \
+                                   ValidationError
 from datetime import date
 from calendar import monthrange
 from collections import namedtuple, deque
@@ -10,6 +11,8 @@ import itertools
 from operator import attrgetter
 from django.forms import Textarea
 from decimal import Decimal
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
 
 
 class Building(models.Model):
@@ -42,6 +45,29 @@ class BuildingFile(models.Model):
     def __unicode__(self):
         return self.name
 
+class BuildingPhoto(models.Model):
+    building = models.ForeignKey(
+        Building, verbose_name=Building._meta.verbose_name)
+    name = models.CharField(_("name"), max_length=255)
+    image = models.ImageField(_('image'), upload_to='building')
+    image_thumbnail = ImageSpecField(source='image',
+                                      processors=[ResizeToFill(200, 100)],
+                                      format='JPEG',
+                                      options={'quality': 60})
+
+    class Meta:
+        verbose_name = _("image")
+
+    def __unicode__(self):
+        return self.name
+    def image_thm(self):
+        if self.image_thumbnail:
+            return u'<a href="%s" target="blank" /><img src="%s" /></a>' % \
+                (self.image.url, self.image_thumbnail.url)
+        else:
+            return '(No image found)'
+    image_thm.short_description = 'Thumb'
+    image_thm.allow_tags = True
 
 class Property(models.Model):
     name = models.CharField(_("name"), max_length=255)
@@ -57,7 +83,21 @@ class Property(models.Model):
     rooms = models.DecimalField(
         _("number of rooms"), max_digits=2, decimal_places=0,
         validators=[MinValueValidator(1)])
-
+    floorplan = models.ImageField(_('floorplan'), upload_to='property')
+    plan_thumbnail = ImageSpecField(source='floorplan',
+                                      processors=[ResizeToFill(200, 100)],
+                                      format='JPEG',
+                                      options={'quality': 60})
+    reservefund = models.SmallIntegerField(
+        _('percentage into reserve fund'), default=10)
+    def plan_thm(self):
+        if self.plan_thumbnail:
+            return u'<a href="%s" target="blank" /><img src="%s" /></a>' % \
+                (self.floorplan.url, self.plan_thumbnail.url)
+        else:
+            return '(No image found)'
+    plan_thm.short_description = 'Thumb'
+    plan_thm.allow_tags = True
     class Meta:
         verbose_name = _("property")
         verbose_name_plural = _("properties")
@@ -65,6 +105,40 @@ class Property(models.Model):
 
     def __unicode__(self):
         return u'{}\n{}'.format(self.name, self.address)
+
+class Room(models.Model):
+    property = models.ForeignKey(
+        Property, verbose_name=Property._meta.verbose_name)
+    name = models.CharField(_("name"), max_length=255)
+    area = models.DecimalField(
+        _("room size (m2)"), max_digits=7, decimal_places=2,
+        validators=[MinValueValidator(0)])
+    def __unicode__(self):
+        return self.name
+
+class RoomPhoto(models.Model):
+    room = models.ForeignKey(
+        Room, verbose_name=Room._meta.verbose_name)
+    name = models.CharField(_("name"), max_length=255)
+    image = models.ImageField(_('image'), upload_to='building')
+    image_thumbnail = ImageSpecField(source='image',
+                                      processors=[ResizeToFill(200, 100)],
+                                      format='JPEG',
+                                      options={'quality': 60})
+
+    class Meta:
+        verbose_name = _("image")
+
+    def __unicode__(self):
+        return self.name
+    def image_thm(self):
+        if self.image_thumbnail:
+            return u'<a href="%s" target="blank" /><img src="%s" /></a>' % \
+                (self.image.url, self.image_thumbnail.url)
+        else:
+            return '(No image found)'
+    image_thm.short_description = 'Thumb'
+    image_thm.allow_tags = True
 
 
 class PropertyFile(models.Model):
@@ -85,7 +159,32 @@ def validate_month(value):
     if value is not None and value.day != 1:
         raise ValidationError(
             _("month expected. Please use first day of the month"))
+class Utility(models.Model):
+    property = models.ForeignKey(
+        Property, verbose_name=Property._meta.verbose_name)
+    name = models.CharField(_("name"), max_length=255)
+    account = models.CharField(_("account info"), max_length=255, blank=True)
+    issueday = models.SmallIntegerField(_("issue day"), default=1,
+        validators=[MinValueValidator(0),MaxValueValidator(31)])
+    issuemonth = models.SmallIntegerField(_("issue month"), default=0,
+        choices=(
+            (0,"All"), (1,"Jan"), (2,"Feb"), (3,"Mar"), (4,"Apr"),
+            (5,"May"), (6,"Jun"), (7,"Jul"), (8,"Aug"), (9,"Sep"),
+            (10,"Oct"), (11,"Nov"), (12, "Dec")
+        )
+    )
+    gracedays = models.SmallIntegerField(_("grace days"), default=15,
+        validators=[MinValueValidator(0),MaxValueValidator(99)])
+    paydby = models.SmallIntegerField(_("paid by"), default=0,
+        choices=( (0,"Tenant"), (1,"Landlord"), (3, "Other") )
+    )
+    class Meta:
+        verbose_name = _("utility")
+        verbose_name_plural = _("utilities")
+        ordering = ['name']
 
+    def __unicode__(self):
+        return self.name
 
 class Tenant(models.Model):
     property = models.ForeignKey(
@@ -93,8 +192,7 @@ class Tenant(models.Model):
         verbose_name=Property._meta.verbose_name,
         on_delete=models.PROTECT)
     name = models.CharField(_("name"), max_length=255)
-    tenancy_begin_date = models.DateField(
-        _("tenancy begin date"))
+    tenancy_begin_date = models.DateField(_("tenancy begin date"))
     tenancy_end_date = models.DateField(
         _("tenancy end date"), blank=True, null=True)
     deposit = models.DecimalField(
