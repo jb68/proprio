@@ -48,7 +48,6 @@ class BuildingFile(models.Model):
 class BuildingPhoto(models.Model):
     building = models.ForeignKey(
         Building, verbose_name=Building._meta.verbose_name)
-    name = models.CharField(_("name"), max_length=255)
     image = models.ImageField(_('image'), upload_to='building')
     image_thumbnail = ImageSpecField(source='image',
                                       processors=[ResizeToFill(200, 100)],
@@ -58,8 +57,6 @@ class BuildingPhoto(models.Model):
     class Meta:
         verbose_name = _("image")
 
-    def __unicode__(self):
-        return self.name
     def image_thm(self):
         if self.image_thumbnail:
             return u'<a href="%s" target="blank" /><img src="%s" /></a>' % \
@@ -119,7 +116,6 @@ class Room(models.Model):
 class RoomPhoto(models.Model):
     room = models.ForeignKey(
         Room, verbose_name=Room._meta.verbose_name)
-    name = models.CharField(_("name"), max_length=255)
     image = models.ImageField(_('image'), upload_to='building')
     image_thumbnail = ImageSpecField(source='image',
                                       processors=[ResizeToFill(200, 100)],
@@ -129,8 +125,6 @@ class RoomPhoto(models.Model):
     class Meta:
         verbose_name = _("image")
 
-    def __unicode__(self):
-        return self.name
     def image_thm(self):
         if self.image_thumbnail:
             return u'<a href="%s" target="blank" /><img src="%s" /></a>' % \
