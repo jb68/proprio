@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'lineage',  # https://github.com/marcuswhybrow/django-lineage
     'bootstrapform',  # https://github.com/tzangms/django-bootstrap-form
+    'nested_inline', # https://github.com/s-block/django-nested-inline
 ]
 
 MIDDLEWARE_CLASSES = [
