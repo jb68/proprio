@@ -55,6 +55,10 @@ class PropertyFileInline(admin.TabularInline):
             # Don't add any extra forms if the related object already exists.
             return 0
         return self.extra
+class ProperyPayableInline(admin.TabularInline):
+    model = models.PropertyPayable
+    extra = 1
+
 
 class UtilityFileInline(admin.TabularInline):
     model = models.Utility
@@ -93,11 +97,15 @@ class RoomInline(NestedTabularInline):
             # Don't add any extra forms if the related object already exists.
             return 0
         return self.extra
+class InventoryInline(admin.TabularInline):
+    model = models.Inventory
+    extra =1
+
 
 class PropertyAdmin(NestedModelAdmin):
     model = models.Property
     list_display = ('name', 'address', 'building', 'plan_thm')
-    inlines = [RoomInline,UtilityFileInline,PropertyFileInline]
+    inlines = [RoomInline,InventoryInline,UtilityFileInline,ProperyPayableInline,PropertyFileInline]
 
     def building_link(self, obj):
         if obj.building is None:

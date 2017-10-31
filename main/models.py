@@ -327,6 +327,50 @@ class RentRevision(models.Model):
         return u"{} - {}".format(self.start_date, self.end_date or "")
 
 
+class PropertyPayable(models.Model):
+    """to be paid for property """
+    description = models.CharField(
+        _("description"), max_length=1024)
+    property = models.ForeignKey(
+        Property,
+        verbose_name=Property._meta.verbose_name,
+        on_delete=models.PROTECT)
+    amount = models.DecimalField(_("amount"), max_digits=7, decimal_places=2)
+    date = models.DateField(_("due date"))
+    bytenant = models.BooleanField(_("paid by tenant"))
+    paid = models.BooleanField(_("paid"))
+
+    class Meta:
+        verbose_name = _("property payables")
+        ordering = ['-date']
+
+    def __unicode__(self):
+        return u"{} - {}".format(self.date, self.amount)
+
+
+class Inventory(models.Model):
+    """Inventory on property passed on tenant"""
+    property = models.ForeignKey(
+        Property,
+        verbose_name=Property._meta.verbose_name,
+        on_delete=models.PROTECT)
+    room = models.ForeignKey(Room, null=True, blank=True, default=None)
+    name = models.CharField(_("name"), max_length=100)
+    amount = models.SmallIntegerField(_("nr of items"), default=1)
+    condition = models.CharField(_("usage condition"), max_length=5,
+        choices = (
+            ("NEW", "new"),
+            ("LKNEW", "like new"),
+            ("GOOD", "good"),
+            ("USED", "used"),
+            ("POOR", "poor")
+        ), default = "GOOD" )
+    value = models.SmallIntegerField(_("replacement value (ron)"), default=1)
+    pdate = models.DateField(_("purchase date"))
+    rdate = models.DateField(_("last repair date"), null=True, blank=True)
+    class Meta:
+        verbose_name = _("inventory on property")
+        verbose_name_plural = _("inventory on property")
 class Payment(models.Model):
     """money received from the tenant"""
     description = models.CharField(
