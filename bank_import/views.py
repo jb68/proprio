@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from forms import GenerateForm, SubmitForm
+from .forms import GenerateForm, SubmitForm
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.db import transaction
 from main.models import Tenant, Payment
-from from_settings import get_element
+from .from_settings import get_element
 from whoosh.filedb.filestore import RamStorage
 from whoosh.fields import TEXT, NUMERIC, Schema
 from whoosh.query import Term, Or
@@ -17,7 +17,7 @@ import re
 import datetime
 import itertools
 from collections import defaultdict
-from models import ImportedLine
+from .models import ImportedLine
 
 
 IMPORTER_SETTINGS = 'PROPRIO_IMPORT_PARSERS'

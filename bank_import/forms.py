@@ -1,5 +1,5 @@
 from django import forms
-from from_settings import get_elements, get_element
+from .from_settings import get_elements, get_element
 
 IMPORTER_SETTINGS = 'PROPRIO_IMPORT_PARSERS'
 

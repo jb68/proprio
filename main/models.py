@@ -80,7 +80,10 @@ class Property(models.Model):
     rooms = models.DecimalField(
         _("number of rooms"), max_digits=2, decimal_places=0,
         validators=[MinValueValidator(1)])
-    floorplan = models.ImageField(_('floorplan'), upload_to='property')
+    floorplan = models.ImageField(_('floorplan'),
+                                  upload_to='property',
+                                  null=True,
+                                  blank=True)
     plan_thumbnail = ImageSpecField(source='floorplan',
                                       processors=[ResizeToFill(200, 100)],
                                       format='JPEG',
@@ -525,11 +528,11 @@ def next_month(date, increment=1):
 
 def add_month(d, increment=1):
     month = d.month - 1 + increment
-    year = d.year + month / 12
-    month = month % 12 + 1
+    year = int(d.year + month / 12)
+    month = int(month % 12 + 1)
     day = d.day
     max_day = monthrange(year, month)[1]
-    day = min(day, max_day)
+    day = int(min(day, max_day))
     return date(month=month, year=year, day=day)
 
 
