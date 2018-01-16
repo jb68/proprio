@@ -116,10 +116,14 @@ class Room(models.Model):
     def __unicode__(self):
         return self.name
 
-class RoomPhoto(models.Model):
-    room = models.ForeignKey(
-        Room, verbose_name=Room._meta.verbose_name)
-    image = models.ImageField(_('image'), upload_to='building')
+class PropertyPhoto(models.Model):
+    property = models.ForeignKey(
+        Property, verbose_name=Property._meta.verbose_name)
+    room = models.ForeignKey(Room, null=True, blank=True,
+        default=None, verbose_name=Room._meta.verbose_name)
+   # room = models.ForeignKey(
+   #    Room, verbose_name=Room._meta.verbose_name)
+    image = models.ImageField(_('image'), upload_to='property')
     image_thumbnail = ImageSpecField(source='image',
                                       processors=[ResizeToFill(200, 100)],
                                       format='JPEG',

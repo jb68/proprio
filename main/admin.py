@@ -71,8 +71,8 @@ class UtilityFileInline(admin.TabularInline):
             return 0
         return self.extra
 
-class RoomPhotoInline(NestedTabularInline):
-    model = models.RoomPhoto
+class PropertyPhotoInline(admin.TabularInline):
+    model = models.PropertyPhoto
     readonly_fields = ("image_thm",)
     extra = 0
 #    fk_name = 'room'
@@ -87,7 +87,7 @@ class RoomPhotoInline(NestedTabularInline):
 
 class RoomInline(NestedTabularInline):
     model = models.Room
-    inlines = [RoomPhotoInline]
+ #   inlines = [RoomPhotoInline]
 #    fk_name = 'property'
     extra = 2
     def get_extra (self, request, obj=None, **kwargs):
@@ -105,7 +105,7 @@ class InventoryInline(admin.TabularInline):
 class PropertyAdmin(NestedModelAdmin):
     model = models.Property
     list_display = ('name', 'address', 'building', 'plan_thm')
-    inlines = [RoomInline,InventoryInline,UtilityFileInline,ProperyPayableInline,PropertyFileInline]
+    inlines = [PropertyPhotoInline,RoomInline,InventoryInline,UtilityFileInline,ProperyPayableInline,PropertyFileInline]
 
     def building_link(self, obj):
         if obj.building is None:
