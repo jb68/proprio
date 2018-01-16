@@ -71,7 +71,7 @@ class UtilityFileInline(admin.TabularInline):
             return 0
         return self.extra
 
-class PropertyPhotoInline(admin.TabularInline):
+class PropertyPhotoInline(NestedTabularInline):
     model = models.PropertyPhoto
     readonly_fields = ("image_thm",)
     extra = 0
