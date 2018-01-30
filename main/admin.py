@@ -4,7 +4,7 @@ from main import models
 from django.core import urlresolvers
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from nested_inline.admin import NestedModelAdmin, NestedTabularInline
+#from nested_inline.admin import NestedModelAdmin, NestedTabularInline
 from django import forms
 
 
@@ -71,7 +71,7 @@ class UtilityFileInline(admin.TabularInline):
             return 0
         return self.extra
 
-class PropertyPhotoInline(NestedTabularInline):
+class PropertyPhotoInline(admin.TabularInline):
     model = models.PropertyPhoto
     readonly_fields = ("image_thm",)
     extra = 0
@@ -85,7 +85,7 @@ class PropertyPhotoInline(NestedTabularInline):
             return ''
 
 
-class RoomInline(NestedTabularInline):
+class RoomInline(admin.TabularInline):
     model = models.Room
  #   inlines = [RoomPhotoInline]
 #    fk_name = 'property'
@@ -102,7 +102,7 @@ class InventoryInline(admin.TabularInline):
     extra =1
 
 
-class PropertyAdmin(NestedModelAdmin):
+class PropertyAdmin(admin.ModelAdmin):
     model = models.Property
     list_display = ('name', 'address', 'building', 'plan_thm')
     inlines = [PropertyPhotoInline,RoomInline,InventoryInline,UtilityFileInline,ProperyPayableInline,PropertyFileInline]
