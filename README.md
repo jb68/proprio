@@ -14,9 +14,15 @@ Please use login `demo/demo`.
 Installation
 ------------
 
+    . ./env/bin/activate
+
     pip install -r requirements.txt
     python manage.py syncdb
+    python manage.py makemigrations
+    python manage.py migrate
     python manage.py runserver
+or
+    gunicorn -b 0.0.0.0:8080 wsg
 
 Custom bank file parser
 -----------------------
