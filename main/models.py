@@ -26,6 +26,8 @@ class Building(models.Model):
 
     def __unicode__(self):
         return self.name
+    def __str__(self):
+        return self.name
 
     def property_count(self):
         return self.property_set.count()
@@ -43,6 +45,8 @@ class BuildingFile(models.Model):
         verbose_name = _("file")
 
     def __unicode__(self):
+        return self.name
+    def __str__(self):
         return self.name
 
 class BuildingPhoto(models.Model):
@@ -69,8 +73,7 @@ class BuildingPhoto(models.Model):
 class Property(models.Model):
     name = models.CharField(_("name"), max_length=255)
     building = models.ForeignKey(
-        Building,
-        verbose_name=Building._meta.verbose_name,
+        Building, verbose_name=Building._meta.verbose_name,
         blank=True, null=True, on_delete=models.PROTECT)
     address = models.TextField(_("address"))
     notes = models.TextField(_("notes"), blank=True)
@@ -105,6 +108,8 @@ class Property(models.Model):
 
     def __unicode__(self):
         return u'{}\n{}'.format(self.name, self.address)
+    def __str__(self):
+        return u'{}\n{}'.format(self.name, self.address)
 
 class Room(models.Model):
     property = models.ForeignKey(
@@ -114,6 +119,8 @@ class Room(models.Model):
         _("room size (m2)"), max_digits=7, decimal_places=2,
         validators=[MinValueValidator(0)])
     def __unicode__(self):
+        return self.name
+    def __str__(self):
         return self.name
 
 class PropertyPhoto(models.Model):
@@ -154,7 +161,8 @@ class PropertyFile(models.Model):
 
     def __unicode__(self):
         return self.name
-
+    def __str__(self):
+        return self.name
 
 def validate_month(value):
     if value is not None and value.day != 1:
@@ -185,6 +193,8 @@ class Utility(models.Model):
         ordering = ['name']
 
     def __unicode__(self):
+        return self.name
+    def __str__(self):
         return self.name
 
 class Tenant(models.Model):
@@ -294,7 +304,8 @@ class TenantFile(models.Model):
 
     def __unicode__(self):
         return self.name
-
+    def __str__(self):
+        return self.name
 
 class Reminder(models.Model):
     tenant = models.ForeignKey(Tenant, verbose_name=Tenant._meta.verbose_name)
@@ -395,7 +406,8 @@ class Payment(models.Model):
 
     def __unicode__(self):
         return u"{} - {}".format(self.date, self.amount)
-
+    def __str__(self):
+        return u"{} - {}".format(self.date, self.amount)
 
 class Refund(models.Model):
     """money returned to the tenant"""
@@ -414,7 +426,8 @@ class Refund(models.Model):
 
     def __unicode__(self):
         return u"{} - {}".format(self.date, self.amount)
-
+    def __str__(self):
+        return u"{} - {}".format(self.date, self.amount)
 
 class Fee(models.Model):
     """a one-time fee (for example an end of year adjustment fee)"""
@@ -432,7 +445,8 @@ class Fee(models.Model):
 
     def __unicode__(self):
         return u"{} - {}".format(self.description, self.date)
-
+    def __str__(self):
+        return u"{} - {}".format(self.description, self.date)
 
 class Discount(models.Model):
     """a one-time discount
@@ -453,7 +467,8 @@ class Discount(models.Model):
 
     def __unicode__(self):
         return u"{} - {}".format(self.description, self.date)
-
+    def __str__(self):
+        return u"{} - {}".format(self.description, self.date)
 
 Cashflow = namedtuple('Cashflow', ['date', 'amount', 'description'])
 CashflowAndBalance = namedtuple('Cashflow',
