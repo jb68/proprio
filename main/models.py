@@ -59,7 +59,11 @@ class BuildingPhoto(models.Model):
                                       options={'quality': 60})
 
     class Meta:
-        verbose_name = _("image")
+        verbose_name = _("building image")
+    def __unicode__(self):
+        return ''
+    def __str__(self):
+        return ''
 
     def image_thm(self):
         if self.image_thumbnail:
@@ -116,8 +120,8 @@ class Room(models.Model):
         Property, verbose_name=Property._meta.verbose_name)
     name = models.CharField(_("name"), max_length=255)
     area = models.DecimalField(
-        _("room size (m2)"), max_digits=7, decimal_places=2,
-        validators=[MinValueValidator(0)])
+        _("room size (m2)"), max_digits=7, decimal_places=2, null=True,
+        blank=True, validators=[MinValueValidator(0)])
     def __unicode__(self):
         return self.name
     def __str__(self):
@@ -137,7 +141,7 @@ class PropertyPhoto(models.Model):
                                       options={'quality': 60})
 
     class Meta:
-        verbose_name = _("image")
+        verbose_name = _("property image")
 
     def image_thm(self):
         if self.image_thumbnail:
@@ -147,7 +151,10 @@ class PropertyPhoto(models.Model):
             return '(No image found)'
     image_thm.short_description = 'Thumb'
     image_thm.allow_tags = True
-
+    def __unicode__(self):
+        return ''
+    def __str__(self):
+        return ''
 
 class PropertyFile(models.Model):
     property = models.ForeignKey(

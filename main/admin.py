@@ -25,7 +25,6 @@ class BuildingPhotoAdmin(admin.ModelAdmin):
     building_link.short_description = _('link to the building')
     readonly_fields = ('building_link',"image_thm",)
 
-
 class BuildingPhotoInline(admin.TabularInline):
     model = models.BuildingPhoto
     extra = 1
