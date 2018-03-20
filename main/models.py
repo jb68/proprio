@@ -503,8 +503,8 @@ def first_of_month_range(start_date, end_date):
     start_index = 12*start_date.year + start_date.month
     end_index = 12*end_date.year + end_date.month
     for index in range(start_index, end_index):
-        month = (index - 1) % 12 + 1
-        year = (index - 1) / 12
+        month =int((index - 1) % 12 + 1)
+        year = int((index - 1) / 12)
         yield date(year, month, 1)
 
 
