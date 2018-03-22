@@ -12,6 +12,7 @@ class BuildingFileInline(admin.TabularInline):
     model = models.BuildingFile
     extra=1
 
+
 class BuildingPhotoAdmin(admin.ModelAdmin):
     fields = ["building","image",]
     list_display = ("building","image","image_thm")
@@ -24,6 +25,7 @@ class BuildingPhotoAdmin(admin.ModelAdmin):
         return format_html(u'<a href={}>{}</a>', mark_safe(url), obj.building)
     building_link.short_description = _('link to the building')
     readonly_fields = ('building_link',"image_thm",)
+
 
 class BuildingPhotoInline(admin.TabularInline):
     model = models.BuildingPhoto
@@ -54,6 +56,8 @@ class PropertyFileInline(admin.TabularInline):
             # Don't add any extra forms if the related object already exists.
             return 0
         return self.extra
+
+
 class ProperyPayableInline(admin.TabularInline):
     model = models.PropertyPayable
     extra = 1
@@ -70,10 +74,18 @@ class UtilityFileInline(admin.TabularInline):
             return 0
         return self.extra
 
+
 class PropertyPhotoInline(admin.TabularInline):
     model = models.PropertyPhoto
     readonly_fields = ("image_thm",)
     extra = 0
+    """Limit the number of rooms presented as options
+    to only related property"""
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "room":
+            kwargs["queryset"] = models.Room.objects.filter(property=request._obj_)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 #    fk_name = 'room'
     def image_thm(self,obj):
         if obj.image_thumbnail:
@@ -96,6 +108,8 @@ class RoomInline(admin.TabularInline):
             # Don't add any extra forms if the related object already exists.
             return 0
         return self.extra
+
+
 class InventoryInline(admin.TabularInline):
     model = models.Inventory
     extra =1
@@ -103,8 +117,15 @@ class InventoryInline(admin.TabularInline):
 
 class PropertyAdmin(admin.ModelAdmin):
     model = models.Property
-    list_display = ('name', 'address', 'building', 'plan_thm')
-    inlines = [PropertyPhotoInline,RoomInline,InventoryInline,UtilityFileInline,ProperyPayableInline,PropertyFileInline]
+    list_display = ('name', 'address', 'building', 'main_thm', 'plan_thm')
+    inlines = [PropertyPhotoInline,RoomInline,InventoryInline,UtilityFileInline,
+               ProperyPayableInline,PropertyFileInline]
+    readonly_fields = ('building_link','floorplan_thm')
+
+    def get_form(self, request, obj=None, **kwargs):
+        # just save obj reference for future processing in Inline
+        request._obj_ = obj
+        return super(PropertyAdmin, self).get_form(request, obj, **kwargs)
 
     def building_link(self, obj):
         if obj.building is None:
@@ -113,7 +134,13 @@ class PropertyAdmin(admin.ModelAdmin):
             'admin:main_building_change', args=(obj.building.id,))
         return format_html(u'<a href={}>{}</a>', mark_safe(url), obj.building)
     building_link.short_description = _('link to the building')
-    readonly_fields = ('building_link',)
+
+    def floorplan_thm(self,obj):
+        if obj.florplan is None:
+            return ("No Picture Available")
+        return obj.plan_thm
+    floorplan_thm.short_description = _('floorplan picture')
+
     class Media:
         css = {
             'all': (
@@ -176,7 +203,6 @@ class TenantReminders(models.Tenant):
         verbose_name_plural = _("tenants reminder lists")
 
 
-
 class ReminderInline(admin.TabularInline):
     fields = ['date', 'read', 'text']
     model = models.Reminder
@@ -189,7 +215,6 @@ class TenantRemindersAdmin(admin.ModelAdmin):
     inlines = [
         ReminderInline,
     ]
-
 
 
 admin.site.register(models.Building, BuildingAdmin)

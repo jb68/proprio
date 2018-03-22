@@ -49,6 +49,7 @@ class BuildingFile(models.Model):
     def __str__(self):
         return self.name
 
+
 class BuildingPhoto(models.Model):
     building = models.ForeignKey(
         Building, verbose_name=Building._meta.verbose_name)
@@ -74,11 +75,16 @@ class BuildingPhoto(models.Model):
     image_thm.short_description = 'Thumb'
     image_thm.allow_tags = True
 
+
 class Property(models.Model):
-    name = models.CharField(_("name"), max_length=255)
-    building = models.ForeignKey(
-        Building, verbose_name=Building._meta.verbose_name,
+    building = models.ForeignKey(Building,
+        verbose_name=Building._meta.verbose_name,
         blank=True, null=True, on_delete=models.PROTECT)
+    # main_photo = models.ForeignKey('PropertyPhoto',
+    #         verbose_name='Main Photo', related_name='property_main_photo',
+    #         blank=True, null=True,on_delete=models.PROTECT)
+
+    name = models.CharField(_("name"), max_length=255)
     address = models.TextField(_("address"))
     notes = models.TextField(_("notes"), blank=True)
     area = models.DecimalField(
@@ -87,6 +93,7 @@ class Property(models.Model):
     rooms = models.DecimalField(
         _("number of rooms"), max_digits=2, decimal_places=0,
         validators=[MinValueValidator(1)])
+
     floorplan = models.ImageField(_('floorplan'),
                                   upload_to='property',
                                   null=True,
@@ -103,8 +110,22 @@ class Property(models.Model):
                 (self.floorplan.url, self.plan_thumbnail.url)
         else:
             return '(No image found)'
-    plan_thm.short_description = 'Thumb'
+    plan_thm.short_description = 'Floorplan'
     plan_thm.allow_tags = True
+
+    def main_thm(self):
+        """
+          Returns the main picture thumb
+        """
+        entry = PropertyPhoto.objects.filter(property=self.id).first()
+        if entry:
+            return u'<a href="%s" target="blank" /><img src="%s" /></a>' % \
+                (entry.image.url, entry.image_thumbnail.url)
+        else:
+            return '(No image found)'
+    main_thm.short_description = 'Main Photo'
+    main_thm.allow_tags = True
+
     class Meta:
         verbose_name = _("property")
         verbose_name_plural = _("properties")
@@ -114,6 +135,7 @@ class Property(models.Model):
         return u'{}\n{}'.format(self.name, self.address)
     def __str__(self):
         return u'{}\n{}'.format(self.name, self.address)
+
 
 class Room(models.Model):
     property = models.ForeignKey(
@@ -127,13 +149,12 @@ class Room(models.Model):
     def __str__(self):
         return self.name
 
+
 class PropertyPhoto(models.Model):
     property = models.ForeignKey(
         Property, verbose_name=Property._meta.verbose_name)
     room = models.ForeignKey(Room, null=True, blank=True,
         default=None, verbose_name=Room._meta.verbose_name)
-   # room = models.ForeignKey(
-   #    Room, verbose_name=Room._meta.verbose_name)
     image = models.ImageField(_('image'), upload_to='property')
     image_thumbnail = ImageSpecField(source='image',
                                       processors=[ResizeToFill(200, 100)],
@@ -156,6 +177,7 @@ class PropertyPhoto(models.Model):
     def __str__(self):
         return ''
 
+
 class PropertyFile(models.Model):
     property = models.ForeignKey(
         Property, verbose_name=Property._meta.verbose_name)
@@ -175,6 +197,8 @@ def validate_month(value):
     if value is not None and value.day != 1:
         raise ValidationError(
             _("month expected. Please use first day of the month"))
+
+
 class Utility(models.Model):
     property = models.ForeignKey(
         Property, verbose_name=Property._meta.verbose_name)
@@ -275,7 +299,7 @@ class Tenant(models.Model):
             result = 0
         return result
 
-# Translators: This is the balance of the tenant's payments
+    # Translators: This is the balance of the tenant's payments
     balance.short_description = _("balance")
 
     def expired_reminders_count(self):
@@ -313,6 +337,7 @@ class TenantFile(models.Model):
         return self.name
     def __str__(self):
         return self.name
+
 
 class Reminder(models.Model):
     tenant = models.ForeignKey(Tenant, verbose_name=Tenant._meta.verbose_name)
@@ -396,6 +421,8 @@ class Inventory(models.Model):
     class Meta:
         verbose_name = _("inventory on property")
         verbose_name_plural = _("inventory on property")
+
+
 class Payment(models.Model):
     """money received from the tenant"""
     description = models.CharField(
@@ -415,6 +442,7 @@ class Payment(models.Model):
         return u"{} - {}".format(self.date, self.amount)
     def __str__(self):
         return u"{} - {}".format(self.date, self.amount)
+
 
 class Refund(models.Model):
     """money returned to the tenant"""
@@ -436,6 +464,7 @@ class Refund(models.Model):
     def __str__(self):
         return u"{} - {}".format(self.date, self.amount)
 
+
 class Fee(models.Model):
     """a one-time fee (for example an end of year adjustment fee)"""
     description = models.CharField(_("description"), max_length=255)
@@ -454,6 +483,7 @@ class Fee(models.Model):
         return u"{} - {}".format(self.description, self.date)
     def __str__(self):
         return u"{} - {}".format(self.description, self.date)
+
 
 class Discount(models.Model):
     """a one-time discount
