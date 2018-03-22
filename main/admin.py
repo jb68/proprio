@@ -42,7 +42,7 @@ class BuildingPhotoInline(admin.TabularInline):
 
 
 class BuildingAdmin(admin.ModelAdmin):
-    list_display = ('name', 'property_count')
+    list_display = ('name', 'property_count', 'main_thm')
     inlines = [BuildingPhotoInline]
 
 

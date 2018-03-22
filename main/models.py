@@ -19,6 +19,19 @@ class Building(models.Model):
     name = models.CharField(_("name"), max_length=255)
     notes = models.TextField(_("notes"), blank=True)
 
+    def main_thm(self):
+        """
+          Returns the main picture thumb
+        """
+        entry = BuildingPhoto.objects.filter(building=self.id).first()
+        if entry:
+            return u'<a href="%s" target="blank" /><img src="%s" /></a>' % \
+                (entry.image.url, entry.image_thumbnail.url)
+        else:
+            return '(No image found)'
+    main_thm.short_description = 'Main Building Photo'
+    main_thm.allow_tags = True
+
     class Meta:
         verbose_name = _("building")
         verbose_name_plural = _("buildings")
@@ -123,7 +136,7 @@ class Property(models.Model):
                 (entry.image.url, entry.image_thumbnail.url)
         else:
             return '(No image found)'
-    main_thm.short_description = 'Main Photo'
+    main_thm.short_description = 'Main Property Photo'
     main_thm.allow_tags = True
 
     class Meta:
