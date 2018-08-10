@@ -402,6 +402,7 @@ class PropertyPayable(models.Model):
         choices = (
             ("BILL", "Bill"),
             ("TAX",  "Tax"),
+            ("COM",  "Commission"),
             ("MNTN", "Maintenance")
         ), default = "BILL" )
     amount = models.DecimalField(_("amount"), max_digits=7, decimal_places=2)
@@ -410,7 +411,7 @@ class PropertyPayable(models.Model):
     paid = models.BooleanField(_("paid"))
 
     class Meta:
-        verbose_name = _("property payables")
+        verbose_name = _("property expenses")
         ordering = ['-date']
 
     def __unicode__(self):
