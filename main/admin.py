@@ -78,6 +78,7 @@ class UtilityFileInline(admin.TabularInline):
 class PropertyPhotoInline(admin.TabularInline):
     model = models.PropertyPhoto
     readonly_fields = ("image_thm",)
+    classes = ['collapse']
     extra = 0
     """Limit the number of rooms presented as options
     to only related property"""
