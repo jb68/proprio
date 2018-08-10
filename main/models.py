@@ -391,13 +391,19 @@ class RentRevision(models.Model):
 
 
 class PropertyPayable(models.Model):
-    """to be paid for property """
-    description = models.CharField(
-        _("description"), max_length=1024)
+    """amounts paid for property """
     property = models.ForeignKey(
         Property,
         verbose_name=Property._meta.verbose_name,
         on_delete=models.PROTECT)
+    description = models.CharField(
+        _("description"), max_length=1024)
+    pmtype = models.CharField(_("Payment Type"), max_length=4,
+        choices = (
+            ("BILL", "Bill"),
+            ("TAX",  "Tax"),
+            ("MNTN", "Maintenance")
+        ), default = "BILL" )
     amount = models.DecimalField(_("amount"), max_digits=7, decimal_places=2)
     date = models.DateField(_("due date"))
     bytenant = models.BooleanField(_("paid by tenant"))
