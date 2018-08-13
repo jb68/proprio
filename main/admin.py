@@ -58,8 +58,8 @@ class PropertyFileInline(admin.TabularInline):
         return self.extra
 
 
-class ProperyPayableInline(admin.TabularInline):
-    model = models.PropertyPayable
+class ProperyExpenseInline(admin.TabularInline):
+    model = models.PropertyExpense
     extra = 1
 
 
@@ -120,7 +120,7 @@ class PropertyAdmin(admin.ModelAdmin):
     model = models.Property
     list_display = ('name', 'address', 'building', 'main_thm', 'plan_thm')
     inlines = [PropertyPhotoInline,RoomInline,InventoryInline,UtilityFileInline,
-               ProperyPayableInline,PropertyFileInline]
+               ProperyExpenseInline,PropertyFileInline]
     readonly_fields = ('building_link','floorplan_thm')
 
     def get_form(self, request, obj=None, **kwargs):

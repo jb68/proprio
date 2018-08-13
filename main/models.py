@@ -390,7 +390,7 @@ class RentRevision(models.Model):
         return u"{} - {}".format(self.start_date, self.end_date or "")
 
 
-class PropertyPayable(models.Model):
+class PropertyExpense(models.Model):
     """amounts paid for property """
     property = models.ForeignKey(
         Property,
