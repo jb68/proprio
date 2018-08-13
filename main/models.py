@@ -411,7 +411,7 @@ class PropertyExpense(models.Model):
     paid = models.BooleanField(_("paid"))
 
     class Meta:
-        verbose_name = _("property expenses")
+        verbose_name = _("property expense")
         ordering = ['-date']
 
     def __unicode__(self):
