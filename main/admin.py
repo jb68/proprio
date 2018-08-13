@@ -75,6 +75,21 @@ class UtilityFileInline(admin.TabularInline):
         return self.extra
 
 
+class RoomInline(admin.TabularInline):
+    model = models.Room
+ #   inlines = [RoomPhotoInline]
+#    fk_name = 'property'
+    extra = 1
+    classes = ['collapse']
+    def get_extra (self, request, obj=None, **kwargs):
+        """Dynamically sets the number of extra forms. 0 if the related object
+        already exists or the extra configuration otherwise."""
+        if obj:
+            # Don't add any extra forms if the related object already exists.
+            return 0
+        return self.extra
+
+
 class PropertyPhotoInline(admin.TabularInline):
     model = models.PropertyPhoto
     readonly_fields = ("image_thm",)
@@ -97,23 +112,14 @@ class PropertyPhotoInline(admin.TabularInline):
             return ''
 
 
-class RoomInline(admin.TabularInline):
-    model = models.Room
- #   inlines = [RoomPhotoInline]
-#    fk_name = 'property'
-    extra = 2
-    def get_extra (self, request, obj=None, **kwargs):
-        """Dynamically sets the number of extra forms. 0 if the related object
-        already exists or the extra configuration otherwise."""
-        if obj:
-            # Don't add any extra forms if the related object already exists.
-            return 0
-        return self.extra
-
-
 class InventoryInline(admin.TabularInline):
     model = models.Inventory
     extra =1
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "room":
+            kwargs["queryset"] = models.Room.objects.filter(property=request._obj_)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class PropertyAdmin(admin.ModelAdmin):
