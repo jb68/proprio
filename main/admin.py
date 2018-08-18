@@ -74,21 +74,31 @@ class UtilityFileInline(admin.TabularInline):
             return 0
         return self.extra
 
+# class RoomAdmin(admin.ModelAdmin):
+# #    inlines = [RoomInline]
+# #    list_display = ('name', 'room_count', 'notes')
+# #    inlines = [BuildingPhotoInline]
+#     list_display = ('name',)
 
-class RoomInline(admin.TabularInline):
-    model = models.Room
- #   inlines = [RoomPhotoInline]
-#    fk_name = 'property'
-    extra = 1
-    classes = ['collapse']
-    def get_extra (self, request, obj=None, **kwargs):
-        """Dynamically sets the number of extra forms. 0 if the related object
-        already exists or the extra configuration otherwise."""
-        if obj:
-            # Don't add any extra forms if the related object already exists.
-            return 0
-        return self.extra
+# class RoomInline(admin.TabularInline):
+#     model = models.Room
+#  #   inlines = [RoomPhotoInline]
+# #    fk_name = 'property'
+#     extra = 1
+#     classes = ['collapse']
+#     def get_extra (self, request, obj=None, **kwargs):
+#         """Dynamically sets the number of extra forms. 0 if the related object
+#         already exists or the extra configuration otherwise."""
+#         if obj:
+#             # Don't add any extra forms if the related object already exists.
+#             return 0
+#         return self.extra
 
+class PropertyTypeAdmin(admin.ModelAdmin):
+#    inlines = [RoomInline]
+#    list_display = ('name', 'room_count', 'notes')
+#    inlines = [BuildingPhotoInline]
+    list_display = ('name', 'notes')
 
 class PropertyPhotoInline(admin.TabularInline):
     model = models.PropertyPhoto
@@ -125,7 +135,7 @@ class InventoryInline(admin.TabularInline):
 class PropertyAdmin(admin.ModelAdmin):
     model = models.Property
     list_display = ('name', 'address', 'building', 'main_thm', 'plan_thm')
-    inlines = [PropertyPhotoInline,RoomInline,InventoryInline,UtilityFileInline,
+    inlines = [PropertyPhotoInline,InventoryInline,UtilityFileInline,
                ProperyExpenseInline,PropertyFileInline]
     readonly_fields = ('building_link','floorplan_thm')
 
@@ -225,7 +235,9 @@ class TenantRemindersAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.Building, BuildingAdmin)
-admin.site.register(models.BuildingPhoto, BuildingPhotoAdmin)
+#admin.site.register(models.BuildingPhoto, BuildingPhotoAdmin)
+admin.site.register(models.PropertyType, PropertyTypeAdmin)
 admin.site.register(models.Property, PropertyAdmin)
+#admin.site.register(models.Room, RoomAdmin)
 admin.site.register(models.Tenant, TenantAdmin)
 admin.site.register(TenantReminders, TenantRemindersAdmin)
