@@ -80,22 +80,22 @@ class UtilityFileInline(admin.TabularInline):
 # #    inlines = [BuildingPhotoInline]
 #     list_display = ('name',)
 
-# class RoomInline(admin.TabularInline):
-#     model = models.Room
+class RoomInline(admin.TabularInline):
+    model = models.Room
 #  #   inlines = [RoomPhotoInline]
-# #    fk_name = 'property'
-#     extra = 1
+#    fk_name = 'property'
+    extra = 1
 #     classes = ['collapse']
-#     def get_extra (self, request, obj=None, **kwargs):
-#         """Dynamically sets the number of extra forms. 0 if the related object
-#         already exists or the extra configuration otherwise."""
-#         if obj:
-#             # Don't add any extra forms if the related object already exists.
-#             return 0
-#         return self.extra
+    def get_extra (self, request, obj=None, **kwargs):
+        """Dynamically sets the number of extra forms. 0 if the related object
+        already exists or the extra configuration otherwise."""
+        if obj:
+             # Don't add any extra forms if the related object already exists.
+             return 0
+        return self.extra
 
 class PropertyTypeAdmin(admin.ModelAdmin):
-#    inlines = [RoomInline]
+    inlines = [RoomInline]
 #    list_display = ('name', 'room_count', 'notes')
 #    inlines = [BuildingPhotoInline]
     list_display = ('name', 'notes')
@@ -125,11 +125,19 @@ class PropertyPhotoInline(admin.TabularInline):
 class InventoryInline(admin.TabularInline):
     model = models.Inventory
     extra =1
-
+ 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "room":
-            kwargs["queryset"] = models.Room.objects.filter(property=request._obj_)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+            try:
+                parent_obj_id = request.resolver_match.args[0]
+                property = models.Property.objects.get(id=parent_obj_id)
+                kwargs["queryset"] = models.Room.objects.filter(
+                    propertytype_id=property.property_type)
+            except IndexError:
+                pass
+        return super(
+            InventoryInline, self).formfield_for_foreignkey(
+            db_field, request, **kwargs)
 
 
 class PropertyAdmin(admin.ModelAdmin):

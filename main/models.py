@@ -88,6 +88,36 @@ class BuildingPhoto(models.Model):
     image_thm.short_description = 'Thumb'
     image_thm.allow_tags = True
 
+class PropertyType(models.Model):
+    name = models.CharField(_("name"), max_length=32)
+    notes = models.TextField(_("notes"), blank=True)
+
+    class Meta:
+        verbose_name = _("property type")
+        verbose_name_plural = _("property types")
+        ordering = ['name']
+
+    def __unicode__(self):
+        return self.name
+    def __str__(self):
+        return self.name
+
+#   def room_count(self):
+#        return self.room_set.count()
+
+#    room_count.short_description = _("number of rooms")
+
+
+class Room(models.Model):
+     propertytype = models.ForeignKey(
+         PropertyType, verbose_name=PropertyType._meta.verbose_name)
+     name = models.CharField(_("name"), max_length=32)
+
+     def __unicode__(self):
+         return self.name
+     def __str__(self):
+         return self.name
+
 
 class Property(models.Model):
     building = models.ForeignKey(Building,
@@ -96,16 +126,15 @@ class Property(models.Model):
     # main_photo = models.ForeignKey('PropertyPhoto',
     #         verbose_name='Main Photo', related_name='property_main_photo',
     #         blank=True, null=True,on_delete=models.PROTECT)
-
+    property_type = models.ForeignKey(PropertyType,
+        verbose_name=PropertyType._meta.verbose_name,
+        blank=True, null=True, on_delete=models.PROTECT)
     name = models.CharField(_("name"), max_length=255)
     address = models.TextField(_("address"))
     notes = models.TextField(_("notes"), blank=True)
     area = models.DecimalField(
         _("surface area"), max_digits=7, decimal_places=2,
         validators=[MinValueValidator(0)])
-    rooms = models.DecimalField(
-        _("number of rooms"), max_digits=2, decimal_places=0,
-        validators=[MinValueValidator(1)])
 
     floorplan = models.ImageField(_('floorplan'),
                                   upload_to='property',
@@ -149,35 +178,7 @@ class Property(models.Model):
     def __str__(self):
         return u'{}\n{}'.format(self.name, self.address)
 
-class PropertyType(models.Model):
-    name = models.CharField(_("name"), max_length=32)
-    notes = models.TextField(_("notes"), blank=True)
 
-    class Meta:
-        verbose_name = _("property type")
-        verbose_name_plural = _("property types")
-        ordering = ['name']
-
-    def __unicode__(self):
-        return self.name
-    def __str__(self):
-        return self.name
-
-#   def room_count(self):
-#        return self.room_set.count()
-
-#    room_count.short_description = _("number of rooms")
-
-
-# class Room(models.Model):
-#     propertytype = models.ForeignKey(
-#         PropertyType, verbose_name=PropertyType._meta.verbose_name)
-#     name = models.CharField(_("name"), max_length=32)
-#
-#     def __unicode__(self):
-#         return self.name
-#     def __str__(self):
-#         return self.name
 
 
 class PropertyPhoto(models.Model):
@@ -441,7 +442,9 @@ class Inventory(models.Model):
         Property,
         verbose_name=Property._meta.verbose_name,
         on_delete=models.PROTECT)
-    # room = models.ForeignKey(Room, null=True, blank=True, default=None)
+    room = models.ForeignKey(Room, null=True, blank=True, default=None,
+                             verbose_name=Room._meta.verbose_name,
+                             on_delete=models.PROTECT)
     name = models.CharField(_("name"), max_length=100)
     amount = models.SmallIntegerField(_("nr of items"), default=1)
     condition = models.CharField(_("usage condition"), max_length=5,
